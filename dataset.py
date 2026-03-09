@@ -34,6 +34,15 @@ class BraTSDataset(Dataset):
         elif image.ndim == 3 and image.shape[0] == 4:
             pass
 
+        # z-score normalization
+        for i in range(image.shape[0]):
+            mean = np.mean(image[i])
+            std = np.std(image[i])
+            if std > 0:
+                image[i] = (image[i] - mean) / std
+            else:
+                image[i] = 0.0
+                
         image = image.astype(np.float32)
             
         # TODO: 4. Extract the ground truth segmentation mask of shape (1, H, W) or (Classes, H, W)
