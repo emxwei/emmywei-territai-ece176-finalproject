@@ -7,16 +7,28 @@ def train_epoch(model, dataloader, optimizer, criterion, device):
     model.train()
     epoch_loss = 0.0
     
-    # tqdm gives you a nice progress bar in your terminal/notebook
     for images, masks in tqdm(dataloader, desc="Training"):
-        # TODO: 1. Move images and masks to `device` (GPU)
-        # TODO: 2. Zero the parameter gradients (optimizer.zero_grad())
-        # TODO: 3. Forward pass: compute predictions
-        # TODO: 4. Calculate loss using `criterion`
-        # TODO: 5. Backward pass: compute gradients (loss.backward())
-        # TODO: 6. Update weights (optimizer.step())
-        # TODO: 7. Accumulate loss for logging
-        pass
+        
+        # move images and masks to `device` (GPU)
+        images, masks = images.to(device), masks.to(device)
+        
+        # zero the parameter gradients (optimizer.zero_grad())
+        optimizer.zero_grad()
+        
+        # forward pass
+        outputs = model(images)
+        
+        # calculate loss 
+        loss = criterion(outputs, masks)
+        
+        # backward pass
+        loss.backward()
+        
+        # update weights
+        optimizer.step()
+        
+        # sum loss
+        epoch_loss += loss.item()
         
     return epoch_loss / len(dataloader)
 
@@ -25,10 +37,21 @@ def validate(model, dataloader, criterion, device):
     val_loss = 0.0
     val_dice = 0.0
     
-    with torch.no_grad(): # No gradients needed for validation!
+    with torch.no_grad(): 
         for images, masks in tqdm(dataloader, desc="Validating"):
-            # TODO: Move to device, forward pass, calculate loss
-            # TODO: Calculate Dice Score for evaluation metric
-            pass
+            
+            # move to device
+            images, masks = images.to(device), masks.to(device)
+
+            # forward pass
+            outputs = model(images)
+
+            # calculate loss
+            loss = criterion(outputs, masks)
+            val_loss += loss.item()
+            
+            # calculate dice score
+            dice_score = 1.0 - loss.item()
+            val_dice += dice_score
             
     return val_loss / len(dataloader), val_dice / len(dataloader)

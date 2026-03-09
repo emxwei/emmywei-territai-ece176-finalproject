@@ -7,7 +7,7 @@ class DoubleConv(nn.Module):
     """(convolution => [BN] => ReLU) * 2"""
     def __init__(self, in_channels, out_channels):
         super().__init__()
-        # TODO: Implement two consecutive 3x3 Convolutions with Batch Normalization and ReLU activation.
+        # implement two consecutive 3x3 convolutions with batch normalization and ReLU activation
 
         # block 1
         self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1, stride=1)
@@ -38,9 +38,11 @@ class UNet(nn.Module):
         self.enc2 = DoubleConv(64, 128)
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
+        # block 3
         self.enc3 = DoubleConv(128, 256)
         self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
 
+        # block 4
         self.enc4 = DoubleConv(256, 512)
         self.pool4 = nn.MaxPool2d(kernel_size=2, stride=2)
         
@@ -69,10 +71,6 @@ class UNet(nn.Module):
         self.finalconv = nn.Conv2d(64, out_classes, kernel_size=1)
 
     def forward(self, x):
-        # TODO: 1. Pass x through encoder, saving outputs for skip connections
-        # TODO: 2. Pass through bottleneck
-        # TODO: 3. Pass through decoder, using torch.cat() to concatenate skip connections
-        # TODO: 4. Return the final logits
 
         # ENCODER
         
