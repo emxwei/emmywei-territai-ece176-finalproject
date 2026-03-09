@@ -1,8 +1,8 @@
-# handles reading  HDF5/NIfTI files, stacking the 4 MRI modalities, and converting them into PyTorch Tensors.
+# handles reading  HDF5 slide files, stacking the 4 MRI modalities, and converting them into PyTorch Tensors
 
 import torch
 from torch.utils.data import Dataset, DataLoader
-import h5py # Assuming you are using HDF5 slices as mentioned in your proposal
+import h5py
 import numpy as np
 
 class BraTSDataset(Dataset):
@@ -17,27 +17,54 @@ class BraTSDataset(Dataset):
 
     def __len__(self):
         # TODO: Return the total number of slices
-        pass
+        return len(self.file_paths)
 
     def __getitem__(self, idx):
         # TODO: 1. Open the HDF5/NIfTI file at self.file_paths[idx]
+        file_path = self.file_paths[idx]
         # TODO: 2. Extract the 4 MRI modalities (T1, T1CE, T2, FLAIR)
+        with h5py.File(file_path, "r") as f:
+            image = f["image"][:].astype(np.float32)
+            mask = f["mask"][:].astype(np.float32)
         # TODO: 3. Stack them into a numpy array of shape (4, H, W)
+        if image.shape[-1] == 4:
+            image = np.transpose(image, (2, 0, 1))
         # TODO: 4. Extract the ground truth segmentation mask of shape (1, H, W) or (Classes, H, W)
-        
-        # Mock data (Replace this with your actual loading logic)
-        image = np.zeros((4, 240, 240), dtype=np.float32) 
-        mask = np.zeros((1, 240, 240), dtype=np.float32)
+        if mask.ndim == 2:
+            mask = np.expand_dims(mask, axis=0)
 
         if self.transform:
             # TODO: Apply augmentations (random flip, rotation, etc.)
-            pass
+            augmented = self.transform(image=image, mask=mask)
+            image = augmented["image"]
+            mask = augmented["mask"]
 
         # Convert to PyTorch tensors
-        image_tensor = torch.tensor(image)
-        mask_tensor = torch.tensor(mask)
+        image_tensor = torch.from_numpy(image)
+        mask_tensor = torch.from_numpy(mask)
 
         return image_tensor, mask_tensor
 
 # TODO: Create a function `get_dataloaders(train_paths, val_paths, batch_size)` 
 # that returns train and validation DataLoaders.
+def get_dataloaders(train_paths, val_paths, batch_size, train_transform=None, val_transform=None, num_workers=0):
+    train_dataset = BraTSDataset(train_paths, transform=train_transform)
+    val_dataset = BraTSDataset(val_paths, transform=val_transform)
+
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers,
+        pin_memory=True
+    )
+
+    val_loader = DataLoader(
+        val_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=num_workers,
+        pin_memory=True
+    )
+
+    return train_loader, val_loader
