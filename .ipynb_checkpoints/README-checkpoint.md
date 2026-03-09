@@ -49,5 +49,3 @@ You should run all code blocks inside the Jupyter Notebook. It is highly recomme
 3. Update the dataset file paths in Cell 3 to point to your local `data/` folder.
 4. **Run All Cells** to initialize the U-Net, train the model over the specified epochs, and generate the side-by-side MRI and prediction visualizations.
 ```
-
-***
