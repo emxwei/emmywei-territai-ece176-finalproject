@@ -7,6 +7,8 @@ Accurate localization of brain tumors in medical images is critical for diagnosi
 
 To handle the severe class imbalance between healthy tissue and diffuse tumor boundaries, the network is optimized using a custom **Dice Loss** function.
 
+Our corresponding final presentation video can be found at [ECE 176 Final Project Video](ECE176FinalProjectVideo.mp4) and final project report can be found at [ECE 176 Final Project Report](ECE176FinalProjectReport.pdf).
+
 ## Repository Structure
 To enable concurrent development and clean version control, the project codebase is modularized into the following files:
 
